@@ -9,7 +9,7 @@ export default function CreatePage() {
 
   return (
 
-    <div>
+    <div className="mt-20">
       <PromptForm input={input} setInput={setInput} />
     </div>
   )
