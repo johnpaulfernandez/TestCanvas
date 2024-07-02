@@ -4,6 +4,11 @@ import * as React from 'react'
 import Textarea from 'react-textarea-autosize'
 import { Button } from './ui/button'
 import { submitUserMessage } from '@/lib/ai/actions';
+import { readStreamableValue } from 'ai/rsc';
+import { useState } from 'react';
+
+export const dynamic = 'force-dynamic';
+export const maxDuration = 30;
 
 
 export function PromptForm({
@@ -14,8 +19,22 @@ export function PromptForm({
   setInput: (value: string) => void
 }) {
 
+  const [generation, setGeneration] = useState<string>('');
+
   return (
-    <form action={submitUserMessage}>
+    <form onSubmit={async (e: any) => {
+      e.preventDefault()
+
+      const value = input.trim()
+      if (!value) return
+
+      const { output } = await submitUserMessage(value);
+
+      for await (const delta of readStreamableValue(output)) {
+        setGeneration(currentGeneration => `${currentGeneration}${delta}`);
+      }
+    }}
+    >
 
       <div className="flex flex-col items-end w-full">
         <Textarea
@@ -33,6 +52,8 @@ export function PromptForm({
         <div>
           <Button type="submit">Generate</Button>
         </div>
+
+        <div>{generation}</div>
       </div>
     </form>
   )
