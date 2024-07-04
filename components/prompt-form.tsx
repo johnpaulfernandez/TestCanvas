@@ -30,8 +30,12 @@ export function PromptForm({
 
       const { output } = await submitUserMessage(value);
 
-      for await (const delta of readStreamableValue(output)) {
-        setGeneration(currentGeneration => `${currentGeneration}${delta}`);
+      for await (const partialObject of readStreamableValue(output)) {
+        if (partialObject) {
+          setGeneration(
+            JSON.stringify(partialObject, null, 2),
+          );
+        }
       }
     }}
     >
