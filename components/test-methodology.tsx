@@ -23,30 +23,43 @@ export const ListTestMethodology = ({ summary }: ListTestMethodologyProps) => {
   const [_, setMessages] = useUIState()
 
   return (
-    <>
+    <div className='flex flex-col space-y-6'>
       <div><b>Feature: </b>{feature}</div>
       <div><b>User Story: </b>{userStory}</div>
       <ul><b>Assumptions:</b>
         {assumptions.map(item => (
-          <li className='list-disc ml-4'>{item}</li>
+          <li key={item} className='list-disc ml-4'>{item}</li>
         ))}
       </ul >
-      <ul><b>Test Scope:</b>
-        {outOfScope.map(item => (
-          <li className='list-disc ml-4'>{item}</li>
-        ))}
-      </ul>
       <div><b>Test Approach: </b>{testApproach}</div>
       <ul><b>Test Environment: </b>
         {testEnvironment.map(item => (
-          <li className='list-disc ml-4'>{item}</li>
+          <li key={item} className='list-disc ml-4'>{item}</li>
         ))}
       </ul>
       <ul><b>Test Data:</b>
         {testData.map(item => (
-          <li className='list-disc ml-4'>{item}</li>
+          <li key={item} className='list-disc ml-4'>{item}</li>
         ))}
       </ul>
-    </>
+      <ul><b>Out of scope:</b>
+        {outOfScope.map(item => (
+          <li key={item} className='list-disc ml-4'>{item}</li>
+        ))}
+      </ul>
+      <div
+        className='cursor-pointer bg-zinc-50 text-zinc-950 rounded-2xl p-4 sm:p-6 hover:bg-zinc-100 transition-colors'
+        onClick={async () => {
+          const response = await submitUserMessage(
+            `The user approved of this test methodology. Now proceeding to the list of functionalities to be tested.`
+          )
+          setMessages((currentMessages: any[]) => [
+            ...currentMessages,
+            response
+          ])
+        }}>
+        Looks good!
+      </div>
+    </div>
   )
 }

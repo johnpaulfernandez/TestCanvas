@@ -9,6 +9,7 @@ import { nanoid } from 'nanoid';
 import { BotCard, BotMessage, UserMessage } from '@/components/message';
 import { ListTestMethodology } from '@/components/test-methodology';
 import { Chat } from '../types';
+import { ListTestFunctionalities } from '@/components/test-functionalities';
 
 const genAI = new GoogleGenerativeAI(
     process.env.GOOGLE_GENERATIVE_AI_API_KEY || ''
@@ -57,6 +58,19 @@ export async function submitUserMessage(input: string) {
             const result = await streamText({
                 model: google('models/gemini-1.5-flash'),
                 temperature: 0,
+                system: `\
+                You are a friendly assistant that helps a QA Engineer create a comprehensive test plan.
+                You can recommend detailed test cases for each feature in the product requirements/user stories provided by the user, and will continue to help the user complete the test plan.
+      
+                Here's the flow: 
+                  1. List the detailed test methodolody which includes the name of the feature, user story, assumptions, out of scope tests, test approach, test environment and test data.
+                  2. List the functionalities that will be tested.
+                  3. One by one, let the user choose a functionality to create test cases for.
+                  4. Provide an option to generate tests for edge cases.
+                  5. Show the completed test plan.
+
+                ${input}`,
+                messages: [...history],
                 tools: {
                     testMethodology: {
                         description:
@@ -71,20 +85,14 @@ export async function submitUserMessage(input: string) {
                             testData: z.array(z.string()),
                         })
                     },
+                    testFunctionalities: {
+                        description:
+                            "List the test functionalities to be tested.",
+                        parameters: z.object({
+                            functionality: z.array(z.string()),
+                        })
+                    },
                 },
-                system: `\
-                You are a friendly assistant that helps a QA Engineer create a comprehensive test plan.
-                You can recommend detailed test cases for each feature in the product requirements/user stories provided by the user, and will continue to help the user complete the test plan.
-      
-                Here's the flow: 
-                  1. List the detailed test methodolody which includes the name of the feature, user story, assumptions, out of scope tests, test approach, test environment and test data.
-                  2. List the functionalities that will be tested.
-                  3. One by one, let the user choose a functionality to create test cases for.
-                  4. Provide an option to generate tests for edge cases.
-                  5. Show the completed test plan.
-
-                ${input}`,
-                messages: [...history]
             });
 
             let textContent = ''
@@ -146,6 +154,38 @@ export async function submitUserMessage(input: string) {
                         uiStream.update(
                             <BotCard>
                                 <ListTestMethodology summary={args} />
+                            </BotCard>
+                        )
+                    } else if (toolName === 'testFunctionalities') {
+
+                        uiStream.update(
+                            <BotCard>
+                                <ListTestFunctionalities list={args} />
+                            </BotCard>
+                        )
+
+                        aiState.done({
+                            ...aiState.get(),
+                            interactions: [],
+                            messages: [
+                                ...aiState.get().messages,
+                                {
+                                    id: nanoid(),
+                                    role: 'assistant',
+                                    content: `Here's the test list of functionalities to be tested.`,
+                                    display: {
+                                        name: 'testFunctionalities',
+                                        props: {
+                                            summary: args
+                                        }
+                                    },
+                                }
+                            ],
+                        })
+
+                        uiStream.update(
+                            <BotCard>
+                                <ListTestFunctionalities list={args} />
                             </BotCard>
                         )
                     }
@@ -234,6 +274,10 @@ export const getUIStateFromAIState = (aiState: Readonly<Chat>) => {
                     message.display?.name === 'testMethodology' ? (
                         <BotCard>
                             <ListTestMethodology summary={message.display?.props.summary} />
+                        </BotCard>
+                    ) : message.display?.name === 'testFunctionalities' ? (
+                        <BotCard>
+                            <ListTestFunctionalities list={message.display?.props.summary} />
                         </BotCard>
                     ) : (
                         <BotMessage content={message.content} />
