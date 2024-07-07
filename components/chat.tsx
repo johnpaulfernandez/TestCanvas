@@ -20,13 +20,6 @@ export function Chat({ id, missingKeys }: ChatProps) {
   const [messages] = useUIState()
   const [aiState] = useAIState()
 
-  // useEffect(() => {
-  //   const messagesLength = aiState.messages?.length
-  //   if (messagesLength === 2) {
-  //     router.refresh()
-  //   }
-  // }, [aiState.messages, router])
-
   return (
     <div>
       <div>

@@ -5,11 +5,13 @@ import { ButtonX } from './ui/buttonx';
 import { AI } from '@/lib/ai/actions';
 import { } from '@/lib/ai/actions';
 import { useActions, useUIState } from 'ai/rsc';
+import { nanoid } from 'nanoid';
+import { UserMessage } from './message';
 
 interface ModalProps {
     input: string
     setInput: (value: string) => void
-    onClose: () => void;
+    onClose: () => void
 }
 
 export default function Modal({ input, setInput, onClose }: ModalProps) {
@@ -25,12 +27,25 @@ export default function Modal({ input, setInput, onClose }: ModalProps) {
 
         onClose()
 
-        const responseMessage = await submitUserMessage(value);
+        try {
 
-        setMessages((currentMessages: any) => [
-            ...currentMessages,
-            responseMessage
-        ])
+            const responseMessage = await submitUserMessage(value);
+
+            setMessages(currentMessages => [
+                ...currentMessages,
+                {
+                    id: nanoid(),
+                    display: <UserMessage>{'Create a new test plan from product requirements'}</UserMessage>
+                }
+            ])
+
+            setMessages((currentMessages: any) => [
+                ...currentMessages,
+                responseMessage
+            ])
+        } catch (e) {
+
+        }
     }
 
     return (

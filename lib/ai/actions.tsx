@@ -100,6 +100,8 @@ export async function submitUserMessage(input: string) {
             for await (const delta of result.fullStream) {
                 const { type } = delta
 
+                console.log(type)
+
                 if (type === 'text-delta') {
                     const { textDelta } = delta
 
