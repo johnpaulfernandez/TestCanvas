@@ -47,6 +47,9 @@ export const ListTestMethodology = ({ summary }: ListTestMethodologyProps) => {
           <li key={item} className='list-disc ml-4'>{item}</li>
         ))}
       </ul>
+
+      <p>Please confirm if this section looks good to you. If yes, I will proceed with the general list of functionalites to be tested.</p>
+
       <div
         className='cursor-pointer bg-zinc-50 text-zinc-950 rounded-2xl p-4 sm:p-6 hover:bg-zinc-100 transition-colors'
         onClick={async () => {

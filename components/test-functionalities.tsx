@@ -26,18 +26,20 @@ export const ListTestFunctionalities = ({ list }: ListProps) => {
       ))}
       </ol>
 
+      <p>Do you have any additional items that you want to test? If not, I can proceed to the creation of test cases.</p>
+
       <div
         className='cursor-pointer bg-zinc-50 text-zinc-950 rounded-2xl p-4 sm:p-6 hover:bg-zinc-100 transition-colors'
         onClick={async () => {
           const response = await submitUserMessage(
-            `The user approved of this test methodology. Now proceeding to the list of functionalities to be tested.`
+            `The user approved of this test methodology. Now proceeding to the test cases for each functionality.`
           )
           setMessages((currentMessages: any[]) => [
             ...currentMessages,
             response
           ])
         }}>
-        Looks good!
+        The list looks good to me!
       </div>
     </div>
   )

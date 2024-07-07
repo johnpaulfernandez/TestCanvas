@@ -27,20 +27,12 @@ export function PromptForm({
   const [aiState] = useAIState()
   const { submitUserMessage } = useActions()
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmitProductRequirements = async (e: any) => {
     e.preventDefault()
 
     const value = input.trim()
     setInput('')
     if (!value) return
-
-    // setMessages(currentMessages => [
-    //   ...currentMessages,
-    //   {
-    //     id: nanoid(),
-    //     display: <UserMessage>{value}</UserMessage>
-    //   }
-    // ])
 
     const responseMessage = await submitUserMessage(value);
 
@@ -51,7 +43,7 @@ export function PromptForm({
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmitProductRequirements}>
       <div className="flex flex-col items-end w-full">
         <Textarea
           tabIndex={0}
@@ -66,7 +58,7 @@ export function PromptForm({
           onChange={e => setInput(e.target.value)}
         />
         <div>
-          <Button type="submit">Create a test plan</Button>
+          <Button type="submit">Send</Button>
         </div>
 
       </div>

@@ -7,6 +7,7 @@ import { PromptForm } from "./prompt-form"
 import { ChatList } from "./chat-list"
 import { WelcomeScreen } from "./welcome-screen"
 import { useRouter } from 'next/navigation'
+import { ProductRequirementsForm } from "./product-requirements-form"
 
 export interface ChatProps extends React.ComponentProps<'div'> {
   id?: string
@@ -28,14 +29,14 @@ export function Chat({ id, missingKeys }: ChatProps) {
 
   return (
     <div>
-      <PromptForm
+      <div>
+        {messages.length ? (<ChatList messages={messages}></ChatList>) : (<WelcomeScreen />)}
+      </div>
+      <ProductRequirementsForm
         id={id}
         input={input}
         setInput={setInput}
       />
-      <div>
-        {messages.length ? (<ChatList messages={messages}></ChatList>) : (<WelcomeScreen />)}
-      </div>
     </div>
 
   )

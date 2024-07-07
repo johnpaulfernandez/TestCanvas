@@ -57,7 +57,7 @@ export async function submitUserMessage(input: string) {
         try {
             const result = await streamText({
                 model: google('models/gemini-1.5-flash'),
-                temperature: 0,
+                temperature: 1.0,
                 system: `\
                 You are a friendly assistant that helps a QA Engineer create a comprehensive test plan.
                 You can recommend detailed test cases for each feature in the product requirements/user stories provided by the user, and will continue to help the user complete the test plan.
