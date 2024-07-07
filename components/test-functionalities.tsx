@@ -18,7 +18,7 @@ export const ListTestFunctionalities = ({ list }: ListProps) => {
   return (
     <div className='flex flex-col space-y-6'>
       <p>
-        Great! Here are the list of functionalities. Please select one to create test cases for.
+        Great! Here are the list of functionalities that you can test.
       </p>
 
       <ol>{list.functionality.map(fx => (
@@ -26,7 +26,7 @@ export const ListTestFunctionalities = ({ list }: ListProps) => {
       ))}
       </ol>
 
-      <p>Do you have any additional items that you want to test? If not, I can proceed to the creation of test cases.</p>
+      <p>Do you have any additional items in mind? If not, I can proceed to the creation of test cases.</p>
 
       <div
         className='cursor-pointer bg-zinc-50 text-zinc-950 rounded-2xl p-4 sm:p-6 hover:bg-zinc-100 transition-colors'

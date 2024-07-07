@@ -10,20 +10,19 @@ import { BotCard, BotMessage, UserMessage } from '@/components/message';
 import { ListTestMethodology } from '@/components/test-methodology';
 import { Chat } from '../types';
 import { ListTestFunctionalities } from '@/components/test-functionalities';
+import { ListTestCases } from '@/components/test-cases';
 
 const genAI = new GoogleGenerativeAI(
     process.env.GOOGLE_GENERATIVE_AI_API_KEY || ''
 )
 
 const testCasesSchema = z.object({
-    testCases: z.array(z.object({
-        id: z.number(),
-        title: z.string().describe('Test case title'),
-        steps: z.array(z.object({
-            stepNumber: z.number(),
-            description: z.string().describe('Test step'),
-        })),
-    })),
+    id: z.number(),
+    title: z.string().describe('Test case title'),
+    steps: z.object({
+        stepNumber: z.number(),
+        description: z.string().describe('Test step'),
+    }),
 })
 
 export async function submitUserMessage(input: string) {
@@ -92,6 +91,11 @@ export async function submitUserMessage(input: string) {
                             functionality: z.array(z.string()),
                         })
                     },
+                    testCases: {
+                        description:
+                            "List the test cases for each functionality.",
+                        parameters: testCasesSchema
+                    },
                 },
             });
 
@@ -127,13 +131,6 @@ export async function submitUserMessage(input: string) {
 
                     if (toolName === 'testMethodology') {
 
-                        uiStream.update(
-                            <BotCard>
-                                <ListTestMethodology summary={args} />
-                            </BotCard>
-                        )
-                        console.log(args.feature)
-
                         aiState.done({
                             ...aiState.get(),
                             interactions: [],
@@ -160,12 +157,6 @@ export async function submitUserMessage(input: string) {
                         )
                     } else if (toolName === 'testFunctionalities') {
 
-                        uiStream.update(
-                            <BotCard>
-                                <ListTestFunctionalities list={args} />
-                            </BotCard>
-                        )
-
                         aiState.done({
                             ...aiState.get(),
                             interactions: [],
@@ -190,8 +181,33 @@ export async function submitUserMessage(input: string) {
                                 <ListTestFunctionalities list={args} />
                             </BotCard>
                         )
-                    }
+                    } else if (toolName === 'testCases') {
 
+                        aiState.done({
+                            ...aiState.get(),
+                            interactions: [],
+                            messages: [
+                                ...aiState.get().messages,
+                                {
+                                    id: nanoid(),
+                                    role: 'assistant',
+                                    content: `Here's the test list of test cases.`,
+                                    display: {
+                                        name: 'testCases',
+                                        props: {
+                                            summary: args
+                                        }
+                                    },
+                                }
+                            ],
+                        })
+
+                        uiStream.update(
+                            <BotCard>
+                                <ListTestCases tests={args} />
+                            </BotCard>
+                        )
+                    }
                 }
             }
             uiStream.done()

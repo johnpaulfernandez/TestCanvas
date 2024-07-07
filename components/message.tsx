@@ -30,6 +30,7 @@ export function BotMessage({
   className?: string
 }) {
   const text = useStreamableText(content)
+  const textWithNewlines = text.split('\n'); // Split on newline characters
 
   return (
     <div className={cn('group relative flex items-start md:-ml-12', className)}>
@@ -37,7 +38,9 @@ export function BotMessage({
         <img className="size-6" src="/images/gemini.png" alt="gemini logo" />
       </div>
       <div className="ml-4 flex-1 space-y-2 overflow-hidden px-1">
-        <div>{text}</div>
+        {textWithNewlines.map((part: string) => (
+          <span key={part}>{part}<br /></span>
+        ))}
       </div>
     </div>
   )
