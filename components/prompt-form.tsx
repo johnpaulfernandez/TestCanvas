@@ -8,6 +8,8 @@ import { readStreamableValue, useAIState, useActions, useUIState } from 'ai/rsc'
 import { useState } from 'react';
 import { UserMessage } from './message';
 import { nanoid } from 'nanoid';
+import { ButtonX } from './ui/buttonx';
+import { SendIcon } from './ui/icons';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -27,7 +29,7 @@ export function PromptForm({
   const [aiState] = useAIState()
   const { submitUserMessage } = useActions()
 
-  const handleSubmitProductRequirements = async (e: any) => {
+  const handleSubmitPrompt = async (e: any) => {
     e.preventDefault()
 
     const value = input.trim()
@@ -43,12 +45,13 @@ export function PromptForm({
   }
 
   return (
-    <form onSubmit={handleSubmitProductRequirements}>
-      <div className="flex flex-col items-end w-full">
+    <form onSubmit={handleSubmitPrompt}>
+
+      <div className="relative flex max-h-60 w-full grow flex-col overflow-hidden bg-zinc-100 px-3 sm:rounded-full sm:px-8">
         <Textarea
           tabIndex={0}
-          placeholder="Write down the product requirements or user stories."
-          className="h-[300px] resize-none bg-zinc-100 w-full bg-transparent placeholder:text-gray-600 px-4 py-[1.3rem] focus-within:outline-none sm:text-sm sm:rounded-md mb-4"
+          placeholder="Message TestCanvas"
+          className="h-[60px] resize-none bg-zinc-100 w-full bg-transparent placeholder:text-gray-600 py-[1.3rem] focus-within:outline-none sm:text-sm sm:rounded-md"
           autoFocus
           spellCheck={false}
           autoComplete="off"
@@ -57,10 +60,16 @@ export function PromptForm({
           value={input}
           onChange={e => setInput(e.target.value)}
         />
-        <div>
-          <Button type="submit">Send</Button>
+        <div className="absolute right-4 top-[13px] sm:right-4">
+          <Button
+            type="submit"
+            disabled={input === ''}
+            className="bg-transparent shadow-none text-zinc-950 rounded-full hover:bg-zinc-200"
+          >
+            <SendIcon />
+            <span className="sr-only">Send message</span>
+          </Button>
         </div>
-
       </div>
     </form>
   )

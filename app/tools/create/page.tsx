@@ -11,9 +11,7 @@ export default async function CreatePage() {
   return (
 
     <AI initialAIState={{ chatId: id, interactions: [], messages: [] }}>
-      <div className="mt-20">
-        <Chat id={id} missingKeys={missingKeys} />
-      </div>
+      <Chat id={id} missingKeys={missingKeys} />
     </AI>
 
   )

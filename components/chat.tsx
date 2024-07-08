@@ -21,16 +21,34 @@ export function Chat({ id, missingKeys }: ChatProps) {
   const [aiState] = useAIState()
 
   return (
-    <div>
-      <div>
-        {messages.length ? (<ChatList messages={messages}></ChatList>) : (<WelcomeScreen />)}
-      </div>
-      <ProductRequirementsForm
-        id={id}
-        input={input}
-        setInput={setInput}
-      />
-    </div>
+    <div className="relative flex h-full max-w-full flex-1 flex-col overflow-hidden">
+      <main className='relative h-full w-full flex-1 overflow-auto transition-width self-center'>
+        <div className='flex h-full flex-col focus-visible:outline-0 items-center justify-center '>
+          <div className='flex-1 overflow-hidden'>
+            <div className='h-full'>
+              <div className='flex h-full flex-col items-center justify-center text-token-text-primary'>
+                <div>
+                  {messages.length ? (<ChatList messages={messages}></ChatList>) : (<WelcomeScreen />)}
+                </div>
+                <ProductRequirementsForm
+                  id={id}
+                  input={input}
+                  setInput={setInput}
+                />
+              </div>
 
+            </div>
+
+          </div>
+        </div>
+      </main>
+      <div className="my-16">
+        <PromptForm
+          id={id}
+          input={input}
+          setInput={setInput}
+        />
+      </div>
+    </div>
   )
 }
