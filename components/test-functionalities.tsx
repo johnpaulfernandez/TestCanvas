@@ -22,7 +22,15 @@ export const ListTestFunctionalities = ({ list }: ListProps) => {
       </p>
 
       <ol>{list.functionality.map(fx => (
-        <li key={fx} className='list-decimal ml-4'>{fx}</li>
+        <li key={fx} className='list-decimal ml-4' onClick={async () => {
+          const response = await submitUserMessage(
+            `Create detailed test cases for ${fx}`
+          )
+          setMessages((currentMessages: any[]) => [
+            ...currentMessages,
+            response
+          ])
+        }}>{fx}</li>
       ))}
       </ol>
 
@@ -32,7 +40,7 @@ export const ListTestFunctionalities = ({ list }: ListProps) => {
         className='cursor-pointer bg-zinc-50 text-zinc-950 rounded-2xl p-4 sm:p-6 hover:bg-zinc-100 transition-colors'
         onClick={async () => {
           const response = await submitUserMessage(
-            `The user approved of this test methodology. Now proceeding to the test cases for each functionality.`
+            `The user approved of this test methodology. Now proceeding to the test cases for each functionality. Please do not change the current list unless told otherwise and ask the user to select a functionality to create test cases for.`
           )
           setMessages((currentMessages: any[]) => [
             ...currentMessages,

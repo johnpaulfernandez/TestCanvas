@@ -22,7 +22,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="flex flex-col relative z-[-1] flex place-items-center">
+      <div className="flex flex-col relative z-[-1] place-items-center">
         <Image
           className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
           src="/logo.png"

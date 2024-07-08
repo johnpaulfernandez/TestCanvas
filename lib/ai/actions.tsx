@@ -56,7 +56,7 @@ export async function submitUserMessage(input: string) {
         try {
             const result = await streamText({
                 model: google('models/gemini-1.5-flash'),
-                temperature: 1.0,
+                temperature: 0,
                 system: `\
                 You are a friendly assistant that helps a QA Engineer create a comprehensive test plan.
                 You can recommend detailed test cases for each feature in the product requirements/user stories provided by the user, and will continue to help the user complete the test plan.
@@ -93,8 +93,14 @@ export async function submitUserMessage(input: string) {
                     },
                     testCases: {
                         description:
-                            "List the test cases for each functionality.",
-                        parameters: testCasesSchema
+                            "List the test cases for the chosen functionality.",
+                        parameters: z.object({
+                            id: z.number(),
+                            title: z.string().describe('Test case title'),
+                            testScenario: z.z.object({
+                                steps: z.array(z.string().describe('Test step'))
+                            })
+                        })
                     },
                 },
             });
@@ -204,7 +210,7 @@ export async function submitUserMessage(input: string) {
 
                         uiStream.update(
                             <BotCard>
-                                <ListTestCases tests={args} />
+                                <ListTestCases test={args} />
                             </BotCard>
                         )
                     }
@@ -296,6 +302,10 @@ export const getUIStateFromAIState = (aiState: Readonly<Chat>) => {
                     ) : message.display?.name === 'testFunctionalities' ? (
                         <BotCard>
                             <ListTestFunctionalities list={message.display?.props.summary} />
+                        </BotCard>
+                    ) : message.display?.name === 'testCases' ? (
+                        <BotCard>
+                            <ListTestCases test={message.display?.props.summary} />
                         </BotCard>
                     ) : (
                         <BotMessage content={message.content} />

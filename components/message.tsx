@@ -11,7 +11,7 @@ import { useStreamableText } from '@/lib/hooks/use-streamable-text'
 
 export function UserMessage({ children }: { children: React.ReactNode }) {
   return (
-    <div className="group relative flex items-start md:-ml-12">
+    <div className="group relative flex items-start">
       <div className="bg-background flex size-[25px] shrink-0 select-none items-center justify-center rounded-lg border shadow-sm">
         <IconUser />
       </div>
@@ -30,17 +30,21 @@ export function BotMessage({
   className?: string
 }) {
   const text = useStreamableText(content)
-  const textWithNewlines = text.split('\n'); // Split on newline characters
+  const parts = text.split(/\*\*(.+?)\*\*/); // Split by bold format (**)
 
   return (
-    <div className={cn('group relative flex items-start md:-ml-12', className)}>
+    <div className={cn('group relative flex items-start', className)}>
       <div className="bg-background flex size-[25px] shrink-0 select-none items-center justify-center rounded-lg border shadow-sm">
         <img className="size-6" src="/images/gemini.png" alt="gemini logo" />
       </div>
       <div className="ml-4 flex-1 space-y-2 overflow-hidden px-1">
-        {textWithNewlines.map((part: string) => (
-          <span key={part}>{part}<br /></span>
-        ))}
+        {parts.map((part, index) => {
+          if (index % 2 === 0) { // Even index = normal text
+            return part.split('\n').map((subpart) => <span><br />{subpart}</span>); // Split by newline (\n) and wrap in span
+          } else { // Odd index = bold text
+            return (<b>{part}</b>); // Wrap in bold tag (<b>)
+          }
+        }).flat()}
       </div>
     </div>
   )
@@ -54,7 +58,7 @@ export function BotCard({
   showAvatar?: boolean
 }) {
   return (
-    <div className="group relative flex items-start md:-ml-12">
+    <div className="group relative flex items-start">
       <div
         className={cn(
           'bg-background flex size-[25px] shrink-0 select-none items-center justify-center rounded-lg border shadow-sm',
