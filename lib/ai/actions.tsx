@@ -1,7 +1,7 @@
 'use server'
 
 import { google } from '@ai-sdk/google';
-import { streamText, tool } from 'ai';
+import { CoreToolChoice, streamText, tool } from 'ai';
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { createAI, createStreamableUI, createStreamableValue, getAIState, getMutableAIState } from 'ai/rsc';
 import z from 'zod'
@@ -9,21 +9,26 @@ import { nanoid } from 'nanoid';
 import { BotCard, BotMessage, UserMessage } from '@/components/message';
 import { ListTestMethodology } from '@/components/test-methodology';
 import { Chat } from '../types';
-import { ListTestFunctionalities } from '@/components/test-functionalities';
-import { ListTestCases } from '@/components/test-cases';
+import { ListProps, ListTestFunctionalities } from '@/components/test-functionalities';
+import { ListTestCases, TestCaseProps } from '@/components/test-cases';
 
 const genAI = new GoogleGenerativeAI(
     process.env.GOOGLE_GENERATIVE_AI_API_KEY || ''
 )
 
-const testCasesSchema = z.object({
+const testCasesObjSchema = z.object({
     id: z.number(),
     title: z.string().describe('Test case title'),
-    steps: z.object({
-        stepNumber: z.number(),
-        description: z.string().describe('Test step'),
-    }),
+    testScenario: z.object({
+        steps: z.array(z.string().describe('Test step')),
+        expectedResult: z.string(),
+        notes: z.string()
+    })
 })
+
+const testCasesSchema = z.object({ testCases: z.array(testCasesObjSchema) })
+
+let testList: ListProps
 
 export async function submitUserMessage(input: string) {
     'use server';
@@ -56,7 +61,7 @@ export async function submitUserMessage(input: string) {
         try {
             const result = await streamText({
                 model: google('models/gemini-1.5-flash'),
-                temperature: 0,
+                temperature: 1.0,
                 system: `\
                 You are a friendly assistant that helps a QA Engineer create a comprehensive test plan.
                 You can recommend detailed test cases for each feature in the product requirements/user stories provided by the user, and will continue to help the user complete the test plan.
@@ -64,7 +69,7 @@ export async function submitUserMessage(input: string) {
                 Here's the flow: 
                   1. List the detailed test methodolody which includes the name of the feature, user story, assumptions, out of scope tests, test approach, test environment and test data.
                   2. List the functionalities that will be tested.
-                  3. One by one, let the user choose a functionality to create test cases for.
+                  3. List the test cases for the chosen functionality.
                   4. Provide an option to generate tests for edge cases.
                   5. Show the completed test plan.
 
@@ -86,26 +91,21 @@ export async function submitUserMessage(input: string) {
                     },
                     testFunctionalities: {
                         description:
-                            "List the test functionalities to be tested.",
+                            "List the functionalities to be tested.",
                         parameters: z.object({
                             functionality: z.array(z.string()),
                         })
                     },
                     testCases: {
                         description:
-                            "List the test cases for the chosen functionality.",
-                        parameters: z.object({
-                            id: z.number(),
-                            title: z.string().describe('Test case title'),
-                            testScenario: z.z.object({
-                                steps: z.array(z.string().describe('Test step'))
-                            })
-                        })
+                            "List all the test cases for the chosen functionality.",
+                        parameters: testCasesSchema
                     },
                 },
             });
 
             let textContent = ''
+            let testCases: TestCaseProps
 
             for await (const delta of result.fullStream) {
                 const { type } = delta
@@ -135,6 +135,8 @@ export async function submitUserMessage(input: string) {
                 } else if (type === 'tool-call') {
                     const { toolName, args } = delta
 
+                    console.log(toolName)
+
                     if (toolName === 'testMethodology') {
 
                         aiState.done({
@@ -163,6 +165,8 @@ export async function submitUserMessage(input: string) {
                         )
                     } else if (toolName === 'testFunctionalities') {
 
+                        testList = { list: args }
+
                         aiState.done({
                             ...aiState.get(),
                             interactions: [],
@@ -189,7 +193,17 @@ export async function submitUserMessage(input: string) {
                         )
                     } else if (toolName === 'testCases') {
 
-                        aiState.done({
+                        testCases = { tests: args, list: testList }
+
+
+
+                        uiStream.update(
+                            <BotCard>
+                                <ListTestCases tests={testCases.tests} list={testList} />
+                            </BotCard>
+                        )
+
+                        aiState.update({
                             ...aiState.get(),
                             interactions: [],
                             messages: [
@@ -201,18 +215,12 @@ export async function submitUserMessage(input: string) {
                                     display: {
                                         name: 'testCases',
                                         props: {
-                                            summary: args
+                                            summary: testCases
                                         }
                                     },
                                 }
                             ],
                         })
-
-                        uiStream.update(
-                            <BotCard>
-                                <ListTestCases test={args} />
-                            </BotCard>
-                        )
                     }
                 }
             }
@@ -222,13 +230,13 @@ export async function submitUserMessage(input: string) {
         } catch (error) {
             console.error(error)
 
-            const errorMessage = new Error(
-                'The AI got rate limited, please try again later.'
-            )
+            // const errorMessage = new Error(
+            //     'The AI got rate limited, please try again later.'
+            // )
 
-            uiStream.error(errorMessage)
-            messageStream.error(errorMessage)
-            aiState.done(errorMessage)
+            // uiStream.error(errorMessage)
+            // messageStream.error(errorMessage)
+            // aiState.done(errorMessage)
         }
 
 
@@ -305,7 +313,7 @@ export const getUIStateFromAIState = (aiState: Readonly<Chat>) => {
                         </BotCard>
                     ) : message.display?.name === 'testCases' ? (
                         <BotCard>
-                            <ListTestCases test={message.display?.props.summary} />
+                            <ListTestCases tests={message.display?.props.summary} list={testList} />
                         </BotCard>
                     ) : (
                         <BotMessage content={message.content} />

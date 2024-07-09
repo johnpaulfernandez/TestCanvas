@@ -4,8 +4,9 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { useActions, useUIState } from 'ai/rsc'
+import { ListTestCases } from './test-cases'
 
-interface ListProps {
+export interface ListProps {
   list: {
     functionality: string[],
   }
@@ -18,29 +19,32 @@ export const ListTestFunctionalities = ({ list }: ListProps) => {
   return (
     <div className='flex flex-col space-y-6'>
       <p>
-        Great! Here are the list of functionalities that you can test.
+        Great! Here are the list of functionalities that you can test. Please select one functionality to create tests for.
       </p>
 
       <ol>{list.functionality.map(fx => (
-        <li key={fx} className='list-decimal ml-4' onClick={async () => {
+        <button key={fx} className='flex items-center gap-2 px-3 py-2 text-sm transition-colors bg-zinc-50 hover:bg-zinc-100 rounded-xl cursor-pointer w-full mb-2' onClick={async () => {
           const response = await submitUserMessage(
-            `Create detailed test cases for ${fx}`
-          )
+            `Proceed to create multiple test cases for the chosen functionality, ${fx}.\
+            Each test case should include a test description, detailed test steps, expected results and any other notes related to the test.`)
+
           setMessages((currentMessages: any[]) => [
             ...currentMessages,
             response
           ])
-        }}>{fx}</li>
+        }}>{fx}</button>
       ))}
       </ol>
 
-      <p>Do you have any additional items in mind? If not, I can proceed to the creation of test cases.</p>
+      {/* <p>Do you have any additional items in mind? If not, I can proceed to the creation of test cases.</p> */}
 
-      <div
+      {/* <div
         className='cursor-pointer bg-zinc-50 text-zinc-950 rounded-2xl p-4 sm:p-6 hover:bg-zinc-100 transition-colors'
         onClick={async () => {
           const response = await submitUserMessage(
-            `The user approved of this test methodology. Now proceeding to the test cases for each functionality. Please do not change the current list unless told otherwise and ask the user to select a functionality to create test cases for.`
+            `The user approved of this test list. Now proceeding to the test cases for each functionality.
+            Ask the user to select a functionality to create test cases for.
+            Each test case will include a test description, detailed test steps, expected results and any other notes related to the test.`
           )
           setMessages((currentMessages: any[]) => [
             ...currentMessages,
@@ -48,7 +52,7 @@ export const ListTestFunctionalities = ({ list }: ListProps) => {
           ])
         }}>
         The list looks good to me!
-      </div>
+      </div> */}
     </div>
   )
 }

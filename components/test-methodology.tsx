@@ -54,8 +54,7 @@ export const ListTestMethodology = ({ summary }: ListTestMethodologyProps) => {
         className='cursor-pointer bg-zinc-50 text-zinc-950 rounded-2xl p-4 sm:p-6 hover:bg-zinc-100 transition-colors'
         onClick={async () => {
           const response = await submitUserMessage(
-            `The user approved of this test methodology. Now proceeding to the list of functionalities to be tested.`
-          )
+            `The user approved of this test methodology. Now proceeding to the list of functionalities to be tested.`)
           setMessages((currentMessages: any[]) => [
             ...currentMessages,
             response
