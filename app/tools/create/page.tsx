@@ -3,6 +3,7 @@ import { PromptForm } from "@/components/prompt-form"
 import { AI, getMissingKeys } from "@/lib/ai/actions"
 import { nanoid } from "nanoid"
 import { useState } from "react"
+import { TestListProvider } from "@/lib/hooks/use-test-list"
 
 export default async function CreatePage() {
   const id = nanoid()
@@ -11,7 +12,9 @@ export default async function CreatePage() {
   return (
 
     <AI initialAIState={{ chatId: id, interactions: [], messages: [] }}>
-      <Chat id={id} missingKeys={missingKeys} />
+      <TestListProvider>
+        <Chat id={id} missingKeys={missingKeys} />
+      </TestListProvider>
     </AI>
 
   )

@@ -28,7 +28,7 @@ const testCasesObjSchema = z.object({
 
 const testCasesSchema = z.object({ testCases: z.array(testCasesObjSchema) })
 
-let testList: ListProps
+let newTestList: ListProps
 
 export async function submitUserMessage(input: string) {
     'use server';
@@ -165,7 +165,7 @@ export async function submitUserMessage(input: string) {
                         )
                     } else if (toolName === 'testFunctionalities') {
 
-                        testList = { list: args }
+                        newTestList = { list: args }
 
                         aiState.done({
                             ...aiState.get(),
@@ -193,13 +193,11 @@ export async function submitUserMessage(input: string) {
                         )
                     } else if (toolName === 'testCases') {
 
-                        testCases = { tests: args, list: testList }
-
-
+                        testCases = { tests: args, list: newTestList }
 
                         uiStream.update(
                             <BotCard>
-                                <ListTestCases tests={testCases.tests} list={testList} />
+                                <ListTestCases tests={testCases.tests} list={newTestList} />
                             </BotCard>
                         )
 
@@ -297,6 +295,8 @@ export async function getMissingKeys() {
 }
 
 export const getUIStateFromAIState = (aiState: Readonly<Chat>) => {
+    // const { testList } = useTestList()
+
     return aiState.messages
         .filter(message => message.role !== 'system')
         .map((message: Message, index) => ({
@@ -313,7 +313,7 @@ export const getUIStateFromAIState = (aiState: Readonly<Chat>) => {
                         </BotCard>
                     ) : message.display?.name === 'testCases' ? (
                         <BotCard>
-                            <ListTestCases tests={message.display?.props.summary} list={testList} />
+                            <ListTestCases tests={message.display?.props.summary} list={message.display?.props.summary.list} />
                         </BotCard>
                     ) : (
                         <BotMessage content={message.content} />

@@ -5,6 +5,7 @@
 
 import { useActions, useUIState } from 'ai/rsc'
 import { ListProps } from './test-functionalities';
+// import { useTestList } from '@/lib/hooks/use-test-list';
 
 interface TestCase {
   id: number,
@@ -27,6 +28,9 @@ export const ListTestCases = ({ tests, list }: TestCaseProps) => {
   const { testCases } = tests
   const { submitUserMessage } = useActions()
   const [_, setMessages] = useUIState()
+  // const { testList, setTestListValue } = useTestList()
+
+  // setTestListValue(list)
 
   return (
     <div className='flex flex-col space-y-6'>
